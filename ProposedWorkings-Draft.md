@@ -12,9 +12,11 @@ After some initial work, a few key features arose:
 * using arrow keys to navigate through menu 
 * sub-menus to keep parent menus simpler
 
+Things that are back-burnered for the next iteration:
+* letting menus interact with each other (parents, children, siblings, etc), ie: settings are not explicitly shared between menus.  (feel free to use static variables if you want)
+
 Other items that aren't clarified yet:
 * what to do after executing a command (press ENTER/Backspace/LeftArrow to return to menu?)
-* should sibling menus interact with each other (ie: parameters shared outside of instance of a single menu)?
 * figure out what else I'm missing
 
 Given a menu structure, the class will print out the list of items, without anything expanded by default.  
@@ -71,6 +73,7 @@ Initial layout (all items expanded; **shows structure**):
 	      i) Debug Level [WARNING]
 		 ii) Default Email [testEmail@localhost]
 	    iii) Run times [30 min]
+         iv) Save debug settings
    5) Print 'Hello World'
 ```
 
@@ -151,59 +154,60 @@ giving the output like:
 I'm not happy with the current state, but here's my first draft of how code to generate this menu **MIGHT** look like:
 
  ```csharp
-        static void Main(string[] args)
-        {
-            var menu = new Menu("Main Menu");
+static void Main(string[] args)
+{
+    var menu = new Menu("Main Menu");
 
-            menu.AddCommand("Test Email", () => { /* code to send test email */ });
-            menu.AddMenu(GetShowStatusMenu());
-            menu.AddMenu(GetLastNotifiedMenu());
-            menu.AddMenu(GetDebugOptionsMenu());
-            menu.AddCommand("Print 'Hello World'", () => { Console.WriteLine("Hello World"); });
+    menu.AddCommand("Test Email", () => { /* code to send test email */ });
+    menu.AddMenu(GetShowStatusMenu());
+    menu.AddMenu(GetLastNotifiedMenu());
+    menu.AddMenu(GetDebugOptionsMenu());
+    menu.AddCommand("Print 'Hello World'", () => { Console.WriteLine("Hello World"); });
 
-            menu.Show();
-        }
+    menu.Show();
+}
 
-        public static Menu GetShowStatusMenu()
-        {
-            List<Database> listOfDatabaseObjects = GetMyDatabases();                       // uses .ToString() to determine text to display in menu
+public static Menu GetShowStatusMenu()
+{
+    List<Database> listOfDatabaseObjects = GetMyDatabases();                       // uses .ToString() to determine text to display in menu
 
-            var statusMenu = new Menu("Show Status");
+    var statusMenu = new Menu("Show Status");
            
-            statusMenu.AddSetVariableCommand("Set Database", listOfDatabaseObjects);
-            statusMenu.AddCommand<Database>("Run Debug Status", DebugStatusFunction);      // essentially runs "DebugStatusFunction( listOfDatabaseObjects[selectedIndex] )"
+    statusMenu.AddSetVariableCommand("Set Database", listOfDatabaseObjects);
+    statusMenu.AddCommand<Database>("Run Debug Status", DebugStatusFunction);      // essentially runs "DebugStatusFunction( listOfDatabaseObjects[selectedIndex] )"
             
-            return statusMenu;
-        }
+    return statusMenu;
+}
 
-        public static Menu GetLastNotifiedMenu()
-        {
-            List<string> listOfSiteObjects = new List<string> {"Site 1", "Site 2"};
+public static Menu GetLastNotifiedMenu()
+{
+    List<string> listOfSiteObjects = new List<string> {"Site 1", "Site 2"};
 
-            var notificationMenu = new Menu("Last Notified");
+    var notificationMenu = new Menu("Last Notified");
 
-            notificationMenu.AddSetVariableCommand("Change Site", listOfSiteObjects);
-            notificationMenu.AddCommand<string>("Show Last Notified", ShowLastNotifiedForSite);
+    notificationMenu.AddSetVariableCommand("Change Site", listOfSiteObjects);
+    notificationMenu.AddCommand<string>("Show Last Notified", ShowLastNotifiedForSite);
 
-            return notificationMenu;
-        }
+    return notificationMenu;
+}
 
-        public static Menu GetDebugOptionsMenu()
-        {
-            var debugOptionsMenu = new Menu("Debug Options");   
+public static Menu GetDebugOptionsMenu()
+{
+    var debugOptionsMenu = new Menu("Debug Options");   
 
-            var statisticsSubMenu = new Menu("Statistics");
-            statisticsSubMenu.AddCommand("Last Ran", () => { /* code */ });
-            statisticsSubMenu.AddCommand("Time to execute", () => { /* code */ });
+    var statisticsSubMenu = new Menu("Statistics");
+    statisticsSubMenu.AddCommand("Last Ran", () => { /* code */ });
+    statisticsSubMenu.AddCommand("Time to execute", () => { /* code */ });
 
-            var changeSettingsSubMenu = new Menu("Change settings");
-            changeSettingsSubMenu.AddSetVariableCommand("Debug Level", GetDebugLevels);
-            changeSettingsSubMenu.AddSetVariableCommand("Default Email", GetDebugLevels);
-            changeSettingsSubMenu.AddSetVariableCommand("Run times", GetAllowedRunTimes);
+    var changeSettingsSubMenu = new Menu("Change settings");
+    changeSettingsSubMenu.AddSetVariableCommand("Debug Level", GetDebugLevels());
+    changeSettingsSubMenu.AddSetStringValueCommand("Default Email", ref defaultEmail);
+    changeSettingsSubMenu.AddSetVariableCommand("Run times", GetAllowedRunTimes());
+    changeSettingsSubMenu.AddCommand("Save debug settings", SaveDebugSettings);
 
-            debugOptionsMenu.AddMenu(statisticsSubMenu);
-            debugOptionsMenu.AddMenu(changeSettingsSubMenu);
+    debugOptionsMenu.AddMenu(statisticsSubMenu);
+    debugOptionsMenu.AddMenu(changeSettingsSubMenu);
 
-            return debugOptionsMenu;
-        }
+    return debugOptionsMenu;
+}
  ```
