@@ -50,7 +50,7 @@ namespace ArrowConsoleMenu
 
                 Console.Write("Please choose an option (x to exit): ");
                 var inputKeyInfo = Console.ReadKey(false);
-                var inputKeyVal = inputKeyInfo.ToString();
+                var inputKeyVal = inputKeyInfo.KeyChar.ToString();
                 Console.WriteLine();
 
                 int menuChoice;
