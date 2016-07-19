@@ -9,9 +9,9 @@ namespace ArrowConsoleMenu
         private readonly bool _exitOnSuccessfulSelect;
         const string SEPARATOR = "- - - - - - - - - - - - - - - - - - - - - - - - ";
 
-        public List<MenuItem> MenuItems { get; set; }
+        public List<IMenuItem> MenuItems { get; set; }
 
-        private int currItemIndex = 1;
+        protected int currItemIndex = 1;
 
         public Menu(string title) : this(title, exitOnSuccessfulSelect: false)
         {

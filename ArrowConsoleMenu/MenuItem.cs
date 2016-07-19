@@ -2,7 +2,7 @@
 
 namespace ArrowConsoleMenu
 {
-    public class MenuItem
+    public class MenuItem : IMenuItem
     {
         private readonly Func<string> _descriptionFunc;
 
