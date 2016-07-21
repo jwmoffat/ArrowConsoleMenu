@@ -8,56 +8,26 @@ namespace TestConsole
     {
         static void Main(string[] args)
         {
-            Menu subMenu = CreateTestSubMenu();
+            var setCountryChoice = new MenuChoices<string>("Set Country", new List<string> { "Canada", "USA" });
+            var setLocalRegionChoice = new MenuChoices<string>("Set Local Region", () => GetLocalRegionsFor(setCountryChoice.SelectedItem));
 
-            SetValueMenuItem<SearchProvider> setsearchProviderMenuItem = CreateSearchProviderMenuChooserItem();
-
-            var baseMenu = new Menu("Base Menu")
-            {
-                MenuItems = new List<IMenuItem>
-                {
-                    new MenuItem("Print Alphabet", PrintAlphabet),
-                    new MenuItem("Show Today's Date", () => { Console.Clear(); Console.WriteLine($"Today: {DateTime.Today:d}"); }),
-                    new MenuItem("Sub Menu", () => subMenu.Show(), pauseAtEndOfAction: false),
-                    setsearchProviderMenuItem,
-                    new MenuItem("Query phone provider", () => { Console.WriteLine($"Do stuff on site {setsearchProviderMenuItem.SelectedEntry.Name} using URL {setsearchProviderMenuItem.SelectedEntry.Url} .." );}),
-                }
-            };
-
-            baseMenu.Show();
+            var menu = new Menu("My Menu");
+            menu.AddChoices(setCountryChoice);
+            menu.AddChoices(setLocalRegionChoice);
+            menu.AddCommand("Print Current Region", () => { Console.WriteLine($"Current region = {setLocalRegionChoice.SelectedItem}"); }, wait: true);
+            menu.Show();
         }
 
-        private static Menu CreateTestSubMenu()
+        static List<string> GetLocalRegionsFor(string country)
         {
-            return new Menu("SubMenu Test")
+            switch (country)
             {
-                MenuItems = new List<IMenuItem>
-                {
-                    new MenuItem("Test sub item 1", () => Console.WriteLine("Do some stuff for sub-item 1")),
-                    new MenuItem("Test sub item 2", () => Console.WriteLine("Do stuff for sub-item 2!")),
-                }
-            };
-        }
-
-        private static SetValueMenuItem<SearchProvider> CreateSearchProviderMenuChooserItem()
-        {
-            var searchProviders = new List<SearchProvider>
-            {
-                new SearchProvider("google", "google.co.uk"),
-                new SearchProvider("bing", "bing.com"),
-                new SearchProvider("yahoo", "yahoo.ca")
-            };
-
-            return new SetValueMenuItem<SearchProvider>("Choose search provider", searchProviders);
-        }
-
-        private static void PrintAlphabet()
-        {
-            Console.Clear();
-            Console.Write("English alphabet: ");
-            for (var c = 'a'; c <= 'z'; c++)
-            {
-                Console.Write(c);
+                case "Canada":
+                    return new List<string> { "BC", "AB" };    // etc..
+                case "USA":
+                    return new List<string> { "AB", "WA" };    // etc..
+                default:
+                    throw new NotImplementedException();
             }
         }
     }

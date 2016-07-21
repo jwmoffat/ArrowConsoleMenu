@@ -5,23 +5,20 @@ namespace ArrowConsoleMenu
 {
     public class Menu
     {
+        const string Separator = "- - - - - - - - - - - - - - - - - - - - - - - - ";
+
         private readonly string _title;
-        private readonly bool _exitOnSuccessfulSelect;
-        const string SEPARATOR = "- - - - - - - - - - - - - - - - - - - - - - - - ";
+        protected bool ExitOnSuccessfulSelect;
+        protected Func<List<IMenuItem>> MenuItemsFunc = null;
+        protected List<IMenuItem> MenuItems = new List<IMenuItem>();
+        protected int CurrItemIndex = 1;
 
-        public List<IMenuItem> MenuItems { get; set; }
-
-        protected int currItemIndex = 1;
-
-        public Menu(string title) : this(title, exitOnSuccessfulSelect: false)
-        {
-            
-        }
+        public Menu(string title) : this(title, exitOnSuccessfulSelect: false) { }
 
         protected Menu(string title, bool exitOnSuccessfulSelect)
         {
             _title = title;
-            _exitOnSuccessfulSelect = exitOnSuccessfulSelect;
+            ExitOnSuccessfulSelect = exitOnSuccessfulSelect;
         }
 
         public void Show()
@@ -31,16 +28,18 @@ namespace ArrowConsoleMenu
 
             do
             {
+                var menuItems = MenuItemsFunc == null ? MenuItems : MenuItemsFunc();
+
                 arrowPressed = false;
                 Console.Clear();
-                Console.WriteLine(SEPARATOR);
+                Console.WriteLine(Separator);
                 Console.WriteLine($"{_title}");
-                Console.WriteLine(SEPARATOR);
-                for (var i = 1; i <= MenuItems.Count; i++)
+                Console.WriteLine(Separator);
+                for (var i = 1; i <= menuItems.Count; i++)
                 {
-                    Console.WriteLine($"{(i == currItemIndex ? '>' : ' ')} {i}. {MenuItems[i - 1].Description}");
+                    Console.WriteLine($"{(i == CurrItemIndex ? '>' : ' ')} {i}. {menuItems[i - 1].Description}");
                 }
-                Console.WriteLine(SEPARATOR);
+                Console.WriteLine(Separator);
                 Console.WriteLine();
                 if (invalidChoice)
                 {
@@ -55,40 +54,54 @@ namespace ArrowConsoleMenu
 
                 int menuChoice;
 
-                if (inputKeyInfo.Key == ConsoleKey.X || inputKeyInfo.Key == ConsoleKey.Q || inputKeyInfo.Key == ConsoleKey.Backspace || inputKeyInfo.Key == ConsoleKey.LeftArrow) return;
-
-                if (inputKeyInfo.Key == ConsoleKey.UpArrow)
+                switch (inputKeyInfo.Key)
                 {
-                    currItemIndex--;
-                    if (currItemIndex < 1) currItemIndex = 1;
-                    arrowPressed = true;
-                }
-                else if (inputKeyInfo.Key == ConsoleKey.DownArrow)
-                {
-                    currItemIndex++;
-                    if (currItemIndex > MenuItems.Count) currItemIndex = MenuItems.Count;
-                    arrowPressed = true;
-                }
-                else if (inputKeyInfo.Key == ConsoleKey.Enter || inputKeyInfo.Key == ConsoleKey.RightArrow)
-                {
-                    //Console.WriteLine("enter pressed");
-                    inputKeyVal = currItemIndex.ToString();
+                    case ConsoleKey.X:
+                    case ConsoleKey.Q:
+                    case ConsoleKey.Backspace:
+                    case ConsoleKey.LeftArrow:
+                        return;
+                    case ConsoleKey.UpArrow:
+                        CurrItemIndex--;
+                        if (CurrItemIndex < 1) CurrItemIndex = 1;
+                        arrowPressed = true;
+                        break;
+                    case ConsoleKey.DownArrow:
+                        CurrItemIndex++;
+                        if (CurrItemIndex > menuItems.Count) CurrItemIndex = menuItems.Count;
+                        arrowPressed = true;
+                        break;
+                    case ConsoleKey.Enter:
+                    case ConsoleKey.RightArrow:
+                        //Console.WriteLine("enter pressed");
+                        inputKeyVal = CurrItemIndex.ToString();
+                        break;
                 }
 
                 if (arrowPressed)
                 {
                     invalidChoice = false;
                 }
-                else if (!int.TryParse(inputKeyVal, out menuChoice) || menuChoice < 1 || menuChoice > MenuItems.Count)
+                else if (!int.TryParse(inputKeyVal, out menuChoice) || menuChoice < 1 || menuChoice > menuItems.Count)
                 {
                     invalidChoice = true;
                 }
                 else
                 {
-                    MenuItems[menuChoice - 1].RunAction();
+                    menuItems[menuChoice - 1].RunAction();
                     invalidChoice = false;
                 }
-            } while (invalidChoice || arrowPressed || !_exitOnSuccessfulSelect);
+            } while (invalidChoice || arrowPressed || !ExitOnSuccessfulSelect);
+        }
+
+        public void AddChoices<T>(MenuChoices<T> menuChoices)
+        {
+            MenuItems.Add(menuChoices);
+        }
+
+        public void AddCommand(string commandName, Action action, bool wait = false)
+        {
+            MenuItems.Add(new MenuItem(commandName, action, pauseAtEndOfAction: wait));
         }
     }
 }
