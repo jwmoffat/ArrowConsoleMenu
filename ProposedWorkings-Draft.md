@@ -119,6 +119,29 @@ Choosing enter on 3 would set the value and return to the previous menu state:
    5) Print 'Hello World'
 ```
 
+## Dependent SetValueEntries
+
+Consider the following case:
+```
+ -----------------------------------------------
+   Main Menu
+ -----------------------------------------------
+   1) Choose Car Maker [Ford]
+   2) Choose Model [F-150]
+```
+
+In this case, changing the selected entry for the first menu affects the list of items in the second menu.   So changing
+Car Maker to Dodge would give
+```
+ -----------------------------------------------
+   Main Menu
+ -----------------------------------------------
+   1) Choose Car Maker [Dodge]
+   2) Choose Model [Ram 1500]
+```
+
+(*This will likely change the formatting of other parts of the document*)
+
 ## SubMenus
 
 Submenus should be treated the same as any regular menu.  In fact, the code that generates a submenu should be stand-alone if wanted.   ie: say the main menu template, that generates previous menu examples above, is something like:
