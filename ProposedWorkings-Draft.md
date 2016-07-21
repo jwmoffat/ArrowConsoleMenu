@@ -111,7 +111,7 @@ In this case, each country will have their own respective sub-choices.  Programm
 static void Main(string[] args)
 {
    var setCountryChoice = new MenuChoices("Set Country", new List<string> { "Canada", "USA" });
-   var setLocalRegionChoice = new MenuChoiceSOMETHING("Set Local Region", (country) => { return GetLocalRegionsFor(country); }
+   var setLocalRegionChoice = new MenuChoices("Set Local Region", () => { GetLocalRegionsFor(setCountryChoice.SelectedItem); });
 
    var menu = new Menu("My Menu");  
    menu.AddChoices(setCountryChoice);
@@ -142,7 +142,7 @@ example, you could want to run a function against a database for one option, and
 ```csharp
 static void Main(string[] args)
 {
-   // Database class overrides ToString() so menu items are identifiable
+   // NB: Database class overrides ToString() so menu items are identifiable
 
    var databaseChoices = new MenuChoices<Database>("Set Selected Database", GetAllDatabases());
    
