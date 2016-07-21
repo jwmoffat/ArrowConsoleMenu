@@ -1,236 +1,173 @@
 # Original Purpose
 
-Originally I started this code to be a method of allowing a user, particularly a person in a QA department, to browse through various commands within an app.   It would give them a list of options, execute the command they wanted, then return them back to the menu again.
+Originally I started this code to be a method of allowing a user, particularly a person in a QA department, to browse through various commands within an 
+app.   It would give them a list of options, execute the command they wanted, then return them back to the menu again.
 
-The code was to be fairly straight-forward in terms of linking up a console project against a library that was under test.
+Over time, this has slowly changed, including this document.  Hopefully this is starting to make more sense.
 
-## Key Features
+## Overview
 
-After some initial work, a few key features arose:
-* listed commands to run with a description
-* method of changing parameters used for a command (ie: current database)
-* using arrow keys to navigate through menu 
-* sub-menus to keep parent menus simpler
+Each Menu has a list of options.  Each option can do one of two general actions:
+1) Run a custom command
+2) Pick a value from a list
 
-Things that are back-burnered for the next iteration:
-* letting menus interact with each other (parents, children, siblings, etc), ie: settings are not explicitly shared between menus.  (feel free to use static variables if you want)
+Choosing an item is done by using the arrow keys:
+- Up/Down select the item
+- Right chooses that menu option
+- Left exits the current menu
 
-Other items that aren't clarified yet:
-* what to do after executing a command (press ENTER/Backspace/LeftArrow to return to menu?)
-* figure out what else I'm missing
+## Beginning Menu
 
-Given a menu structure, the class will print out the list of items, without anything expanded by default.  
-* Items that end with ```...``` indicate a sub-menu that will expand in place.   
-* Items with square brackets, such as ```[Some Name]```, are for setting values within the menu, such as the currently selected database (in these examples).
+A very basic menu might be just a list options to run various pieces of code.   For example:
 
-# Example Menu Layout (Prototyping)
-
-This is definitely a **work in progress** and changes as I create it.
-
-Initial layout (collapsed), marker on item 2:
- ```
- -----------------------------------------------
-   Main Menu
- -----------------------------------------------
-   1) Test Email ...
- > 2) Show Status ...
-   3) Last Notified ...
-   4) Debug Options ...
-   5) Print 'Hello World'
+```
+----------------------------
+ My Menu
+----------------------------
+ > 1. Print 'Hello World'
+   2. Show current date
+   3. Send me an email
+----------------------------
 ```
 
-Initial layout (expanded sub-menu 2):
- ```
------------------------------------------------
-   Main Menu
- -----------------------------------------------
-   1) Test Email ...
- > 2) Show Status
-     a) Set Database [Client 1]
-	 b) Run Debug Status
-   3) Last Notified ...
-   4) Debug Options ...
-   5) Print 'Hello World'
-```
-
-Initial layout (all items expanded; **shows structure**):
- ```
- -----------------------------------------------
-   Main Menu
- -----------------------------------------------
-   1) Test Email
- > 2) Show Status
-     a) Set Database [Client 1]
-	 b) Run Debug Status
-   3) Last Notified
-     a) Change Site [Site 3]
- 	 b) Show Last Notified
-   4) Debug Options
- 	 a) Statistics
-	      i) Last Ran
-		 ii) Time to Execute
-	 b) Change settings
-	      i) Debug Level [WARNING]
-		 ii) Default Email [testEmail@localhost]
-	    iii) Run times [30 min]
-         iv) Save debug settings
-   5) Print 'Hello World'
-```
-
-## Adjusting a SetValueEntry:
-
-Let's say expanded 'Show Status' and are to change the current database.
-
- ```
- -----------------------------------------------
-   Main Menu
- -----------------------------------------------
-   1) Test Email
-   2) Show Status
- >   a) Set Database [Client 1]
-	 b) Run Debug Status
-   3) Last Notified
-   4) Debug Options
-   5) Print 'Hello World'
-```
-
-Pressing right-arrow (or enter), gives a new list/menu appears, with previous selected item set:
- ```
- -----------------------------------------------
-   Show Status -> Set Database [Client 1]
- -----------------------------------------------
- > 1) Client 1
-   2) Client 2
-   3) Some Other Client
-   4) Yet Another Client
-```
-
-Choosing enter on 3 would set the value and return to the previous menu state:
-```
- -----------------------------------------------
-   Main Menu
- -----------------------------------------------
-   1) Test Email
-   2) Show Status
- >   a) Set Database [Some Other Client]
-	 b) Run Debug Status
-   3) Last Notified
-   4) Debug Options
-   5) Print 'Hello World'
-```
-
-## Dependent SetValueEntries
-
-Consider the following case:
-```
- -----------------------------------------------
-   Main Menu
- -----------------------------------------------
-   1) Choose Car Maker [Ford]
-   2) Choose Model [F-150]
-```
-
-In this case, changing the selected entry for the first menu affects the list of items in the second menu.   So changing
-Car Maker to Dodge would give
-```
- -----------------------------------------------
-   Main Menu
- -----------------------------------------------
-   1) Choose Car Maker [Dodge]
-   2) Choose Model [Ram 1500]
-```
-
-(*This will likely change the formatting of other parts of the document*)
-
-## SubMenus
-
-Submenus should be treated the same as any regular menu.  In fact, the code that generates a submenu should be stand-alone if wanted.   ie: say the main menu template, that generates previous menu examples above, is something like:
+Some of these commands you might want the user to wait for the user to read what's been output, so you can specify an additional wait flag for commands.
+To create a menu like this is very straight-forward:
 
 ```csharp
- var menu = new Menu("Main Menu");  
- menu.AddCommand("Test Email", () => { /* code to send test email */ });
- menu.AddMenu(GetShowStatusMenu());
- // etc..
-  
- menu.Show();
-```
-
-Then this should also work:
-
-```csharp
- var menu = GetShowStatusMenu();  
- menu.Show();
-```
-
-giving the output like:
-```
------------------------------------------------
-  Show Status
------------------------------------------------
- >  1) Set Database [Some Other Client]
-    2) Run Debug Status
-```
-
-
-## Implementing menu:
-
-I'm not happy with the current state, but here's my first draft of how code to generate this menu **MIGHT** look like:
-
- ```csharp
 static void Main(string[] args)
 {
-    var menu = new Menu("Main Menu");
-
-    menu.AddCommand("Test Email", () => { /* code to send test email */ });
-    menu.AddMenu(GetShowStatusMenu());
-    menu.AddMenu(GetLastNotifiedMenu());
-    menu.AddMenu(GetDebugOptionsMenu());
-    menu.AddCommand("Print 'Hello World'", () => { Console.WriteLine("Hello World"); });
-
-    menu.Show();
+   var menu = new Menu("My Menu");
+   menu.AddCommand("Print 'Hello World'", () => { Console.WriteLine("Hello World"); }, wait: true);
+   menu.AddCommand("Show current date",   () => { Console.WriteLine(DateTime.Now);  }, wait: true);
+   menu.AddCommand("Send me an email",    () => { Emailer.SendEmail(); });							  // wait = false by default
+   menu.Show();   
 }
+```
 
-public static Menu GetShowStatusMenu()
+## Setting a value using menus
+
+The next step of the menu is to allow addition of an option where the user can select a value.   For example:
+
+```
+----------------------------
+ My Menu
+----------------------------
+ > 1. Set Name [Adam]
+   2. Print Selected Name
+----------------------------
+```
+
+For this example, the first option lets the user select the name from a list.  If the user chooses the Set Name option, they see:
+```
+----------------------------
+ Set Name
+----------------------------
+ > 1. Adam
+   2. Bob
+   3. Sally
+----------------------------
+```
+
+If the user chose option 2 (Bob), the menu reverts back to:
+```
+----------------------------
+ My Menu
+----------------------------
+ > 1. Set Name [Bob]
+   2. Print Selected Name
+----------------------------
+```
+
+That's all good, but now how does that work for passing the value to print it?   The answer is to reference the menu option was added.
+
+```csharp
+static void Main(string[] args)
 {
-    List<Database> listOfDatabaseObjects = GetMyDatabases();                       // uses .ToString() to determine text to display in menu
-
-    var statusMenu = new Menu("Show Status");
-           
-    statusMenu.AddSetVariableCommand("Set Database", listOfDatabaseObjects);
-    statusMenu.AddCommand<Database>("Run Debug Status", DebugStatusFunction);      // essentially runs "DebugStatusFunction( listOfDatabaseObjects[selectedIndex] )"
-            
-    return statusMenu;
+   var setNameChoice = new MenuChoices("Set Name", new List<string> { "Adam", "Bob", "Sally" });      
+   var menu = new Menu("My Menu");  
+   menu.AddChoices(setNameChoice);
+   menu.AddCommand("Print Selected Name", () => { Console.WriteLine($"Current name = {setNameChoice.SelectedItem}"); });
+   menu.Show();   
 }
+```
 
-public static Menu GetLastNotifiedMenu()
+## Setting a value, but list is based off another option
+
+While maybe not standard, a new feature of the menu was wanted.  This example differs from the others slightly, mostly for the sake of simplicity:
+
+```
+----------------------------
+ My Menu
+----------------------------
+ > 1. Set Country [Canada]
+   2. Set Local Region [BC]
+   3. Print Current Region
+----------------------------
+```
+
+In this case, each country will have their own respective sub-choices.  Programming this could look like:
+
+```csharp
+static void Main(string[] args)
 {
-    List<string> listOfSiteObjects = new List<string> {"Site 1", "Site 2"};
+   var setCountryChoice = new MenuChoices("Set Country", new List<string> { "Canada", "USA" });
+   var setLocalRegionChoice = new MenuChoiceSOMETHING("Set Local Region", (country) => { return GetLocalRegionsFor(country); }
 
-    var notificationMenu = new Menu("Last Notified");
-
-    notificationMenu.AddSetVariableCommand("Change Site", listOfSiteObjects);
-    notificationMenu.AddCommand<string>("Show Last Notified", ShowLastNotifiedForSite);
-
-    return notificationMenu;
+   var menu = new Menu("My Menu");  
+   menu.AddChoices(setCountryChoice);
+   menu.AddCommand("PPrint Current Region", () => { Console.WriteLine($"Current region = {setLocalRegionChoice.SelectedItem}"); });
+   menu.Show();   
 }
 
-public static Menu GetDebugOptionsMenu()
+List<string> GetLocalRegionsFor(string country)
 {
-    var debugOptionsMenu = new Menu("Debug Options");   
-
-    var statisticsSubMenu = new Menu("Statistics");
-    statisticsSubMenu.AddCommand("Last Ran", () => { /* code */ });
-    statisticsSubMenu.AddCommand("Time to execute", () => { /* code */ });
-
-    var changeSettingsSubMenu = new Menu("Change settings");
-    changeSettingsSubMenu.AddSetVariableCommand("Debug Level", GetDebugLevels());
-    changeSettingsSubMenu.AddSetStringValueCommand("Default Email", ref defaultEmail);
-    changeSettingsSubMenu.AddSetVariableCommand("Run times", GetAllowedRunTimes());
-    changeSettingsSubMenu.AddCommand("Save debug settings", SaveDebugSettings);
-
-    debugOptionsMenu.AddMenu(statisticsSubMenu);
-    debugOptionsMenu.AddMenu(changeSettingsSubMenu);
-
-    return debugOptionsMenu;
+   switch (country)
+   {
+      case "Canada": 
+	     return new List<string> { "BC", "AB" };    // etc
+	  case "USA": 
+	     return new List<string> { "AB", "WA" };    // etc..
+	  default:
+	     throw new NotImplementedException();
+   }
 }
- ```
+```
+
+
+## Non-String Lists
+
+It makes sense that the list of items being passed in don't have to be strings.  There's only so much viability from doing this.  For
+example, you could want to run a function against a database for one option, and another option to select the given database.   
+
+```csharp
+static void Main(string[] args)
+{
+   // Database class overrides ToString() so menu items are identifiable
+
+   var databaseChoices = new MenuChoices<Database>("Set Selected Database", GetAllDatabases());
+   
+   var menu = new Menu("My Menu");  
+   menu.AddChoices(setCountryChoice);
+   menu.AddCommand<Database>("Run Report Against Selected Database", (currDatabase) => { RunReport(currDatabase); });
+   menu.Show();   
+}
+
+void RunReport(Database currDatabase)
+{
+   // Do stuff
+}
+```
+
+The menu for this might appear as
+```
+----------------------------
+ My Menu
+----------------------------
+ > 1. Set Selected Database [Northwind]
+   2. Run Report Against Selected Database
+----------------------------
+```
+
+## Setting a value and running a command
+
+Currently, this feature is not yet implemented.
