@@ -134,11 +134,16 @@ namespace ArrowConsoleMenu
         {
             MenuItems.Add(subMenu);
         }
+        public void AddTextInput(MenuTextChoice menuTextInputChoice)
+        {
+            MenuItems.Add(menuTextInputChoice);
+        }
 
         public string Description => _title;
         public void RunAction()
         {
             Show();
         }
+
     }
 }
