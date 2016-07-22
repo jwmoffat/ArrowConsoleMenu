@@ -99,7 +99,7 @@ namespace ArrowConsoleMenu
             MenuItems.Add(menuChoices);
         }
 
-        public void AddCommand(string commandName, Action action, bool wait = false)
+        public void AddCommand(string commandName, Action action, bool wait = true)
         {
             MenuItems.Add(new MenuItem(commandName, action, pauseAtEndOfAction: wait));
         }

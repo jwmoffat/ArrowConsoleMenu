@@ -11,7 +11,7 @@ namespace TestConsole
             var setNameChoice = new MenuChoices<string>("Set Name", new List<string> { "Adam", "Bob", "Sally" });
             var menu = new Menu("Simple Menu");
             menu.AddChoices(setNameChoice);
-            menu.AddCommand("Print Selected Name", () => { Console.WriteLine($"Current name = {setNameChoice.SelectedItem}"); }, wait: true);
+            menu.AddCommand("Print Selected Name", () => { Console.WriteLine($"Current name = {setNameChoice.SelectedItem}"); });
             return menu;
         }
     }

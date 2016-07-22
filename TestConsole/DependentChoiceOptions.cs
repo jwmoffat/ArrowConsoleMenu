@@ -14,7 +14,7 @@ namespace TestConsole
             var menu = new Menu("Dependent Choice Menu");
             menu.AddChoices(setCountryChoice);
             menu.AddChoices(setLocalRegionChoice);
-            menu.AddCommand("Print Current Region", () => { Console.WriteLine($"Current region = {setLocalRegionChoice.SelectedItem}"); }, wait: true);
+            menu.AddCommand("Print Current Region", () => { Console.WriteLine($"Current region = {setLocalRegionChoice.SelectedItem}"); });
             return menu;
         }
 
