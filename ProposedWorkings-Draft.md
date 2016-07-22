@@ -22,7 +22,7 @@ A very basic menu might be just a list options to run various pieces of code.   
 
 ```
 ----------------------------
- My Menu
+ Basic Menu
 ----------------------------
  > 1. Print 'Hello World'
    2. Show current date
@@ -36,11 +36,11 @@ To create a menu like this is very straight-forward:
 ```csharp
 static void Main(string[] args)
 {
-   var menu = new Menu("My Menu");
-   menu.AddCommand("Print 'Hello World'", () => { Console.WriteLine("Hello World"); }, wait: true);
-   menu.AddCommand("Show current date",   () => { Console.WriteLine(DateTime.Now);  }, wait: true);
-   menu.AddCommand("Send me an email",    () => { Emailer.SendEmail(); });							  // wait = false by default
-   menu.Show();   
+	var menu = new Menu("Basic Menu");
+	menu.AddCommand("Print 'Hello World'", () => { Console.WriteLine("Hello World"); });
+	menu.AddCommand("Show current date",   () => { Console.WriteLine(DateTime.Now); });
+	menu.AddCommand("Send me an email",    () => { Emailer.SendEmail(); }, wait: false);      // wait = true by default
+	menu.Show();   
 }
 ```
 
@@ -50,7 +50,7 @@ The next step of the menu is to allow addition of an option where the user can s
 
 ```
 ----------------------------
- My Menu
+ Select Options Menu
 ----------------------------
  > 1. Set Name [Adam]
    2. Print Selected Name
@@ -71,7 +71,7 @@ For this example, the first option lets the user select the name from a list.  I
 If the user chose option 2 (Bob), the menu reverts back to:
 ```
 ----------------------------
- My Menu
+ Select Options Menu
 ----------------------------
  > 1. Set Name [Bob]
    2. Print Selected Name
@@ -83,11 +83,11 @@ That's all good, but now how does that work for passing the value to print it?  
 ```csharp
 static void Main(string[] args)
 {
-   var setNameChoice = new MenuChoices("Set Name", new List<string> { "Adam", "Bob", "Sally" });      
-   var menu = new Menu("My Menu");  
-   menu.AddChoices(setNameChoice);
-   menu.AddCommand("Print Selected Name", () => { Console.WriteLine($"Current name = {setNameChoice.SelectedItem}"); });
-   menu.Show();   
+	var setNameChoice = new MenuChoices<string>("Set Name", new List<string> { "Adam", "Bob", "Sally" });
+	var menu = new Menu("Select Options Menu");
+	menu.AddChoices(setNameChoice);
+	menu.AddCommand("Print Selected Name", () => { Console.WriteLine($"Current name = {setNameChoice.SelectedItem}"); });
+	menu.Show();
 }
 ```
 
@@ -97,7 +97,7 @@ While maybe not standard, a new feature of the menu was wanted.  This example di
 
 ```
 ----------------------------
- My Menu
+ Dependent Choice Menu
 ----------------------------
  > 1. Set Country [Canada]
    2. Set Local Region [BC]
@@ -110,13 +110,14 @@ In this case, each country will have their own respective sub-choices.  Programm
 ```csharp
 static void Main(string[] args)
 {
-   var setCountryChoice = new MenuChoices("Set Country", new List<string> { "Canada", "USA" });
-   var setLocalRegionChoice = new MenuChoices("Set Local Region", () => { GetLocalRegionsFor(setCountryChoice.SelectedItem); });
+	var setCountryChoice = new MenuChoices<string>("Set Country", new List<string> { "Canada", "USA" });
+	var setLocalRegionChoice = new MenuChoices<string>("Set Local Region", () => GetLocalRegionsFor(setCountryChoice.SelectedItem));
 
-   var menu = new Menu("My Menu");  
-   menu.AddChoices(setCountryChoice);
-   menu.AddCommand("PPrint Current Region", () => { Console.WriteLine($"Current region = {setLocalRegionChoice.SelectedItem}"); });
-   menu.Show();   
+	var menu = new Menu("Dependent Choice Menu");
+	menu.AddChoices(setCountryChoice);
+	menu.AddChoices(setLocalRegionChoice);
+	menu.AddCommand("Print Current Region", () => { Console.WriteLine($"Current region = {setLocalRegionChoice.SelectedItem}"); });
+	menu.Show();
 }
 
 List<string> GetLocalRegionsFor(string country)
