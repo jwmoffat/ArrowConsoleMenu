@@ -134,7 +134,6 @@ List<string> GetLocalRegionsFor(string country)
 }
 ```
 
-
 ## Non-String Lists
 
 It makes sense that the list of items being passed in don't have to be strings.  There's only so much viability from doing this.  For
@@ -143,14 +142,13 @@ example, you could want to run a function against a database for one option, and
 ```csharp
 static void Main(string[] args)
 {
-   // NB: Database class overrides ToString() so menu items are identifiable
-
-   var databaseChoices = new MenuChoices<Database>("Set Selected Database", GetAllDatabases());
-   
-   var menu = new Menu("My Menu");  
-   menu.AddChoices(setCountryChoice);
-   menu.AddCommand<Database>("Run Report Against Selected Database", (currDatabase) => { RunReport(currDatabase); });
-   menu.Show();   
+	// NB: Database class overrides ToString() so menu items are identifiable
+	var databaseChoices = new MenuChoices<Database>("Set Selected Database", GetAllDatabases());
+            
+	var menu = new Menu("Non-String List Menu Example");
+	menu.AddChoices(databaseChoices);
+	menu.AddCommand("Run Report Against Selected Database", () => { RunReport(databaseChoices.SelectedItem); });     // passes database, not string
+	menu.Show();   
 }
 
 void RunReport(Database currDatabase)
@@ -164,7 +162,7 @@ The menu for this might appear as
 ----------------------------
  My Menu
 ----------------------------
- > 1. Set Selected Database [Northwind]
+ > 1. Set Selected Database [Database 1]
    2. Run Report Against Selected Database
 ----------------------------
 ```

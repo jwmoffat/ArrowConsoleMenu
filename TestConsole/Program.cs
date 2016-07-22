@@ -10,6 +10,7 @@ namespace TestConsole
             menu.AddSubMenu(SimpleMenu.GetExampleMenu());
             menu.AddSubMenu(SelectOptionMenu.GetExampleMenu());
             menu.AddSubMenu(DependentChoiceOptions.GetExampleMenu());
+            menu.AddSubMenu(NonStringClassExample.GetExampleMenu());
             menu.Show();
         }
     }
