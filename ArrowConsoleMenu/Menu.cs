@@ -47,7 +47,7 @@ namespace ArrowConsoleMenu
                     Console.WriteLine();
                 }
 
-                Console.Write("Please choose an option (x to exit): ");
+                Console.Write("Please choose an option using arrow keys.  Right to select item, Left to exit.  ");
                 var inputKeyInfo = Console.ReadKey(false);
                 var inputKeyVal = inputKeyInfo.KeyChar.ToString();
                 Console.WriteLine();
