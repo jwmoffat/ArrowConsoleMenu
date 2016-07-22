@@ -173,6 +173,68 @@ The menu for this might appear as
 ----------------------------
 ```
 
+## Long lists
+
+Sometimes there are cases where the list of items to choose from exceed the screen size.  To 
+handle this, a page-size is defined for a menu.  (Default value = TBD)
+
+Say a menu is created with 7 items and the page size is 5 (items).  The setup would be something like:
+
+```csharp
+static void Main(string[] args)
+{
+	var setNameChoice = new MenuChoices<string>("Set Placement", new List<string>
+	    { 
+	       "First", "Second", "Third", "Fourth", "Fifth", "Sixth", "Seventh"
+	    });
+	var menu = new Menu("Too Many Choices Menu");
+	menu.AddChoices(setNameChoice);
+	menu.AddCommand("Print Placement", () => { Console.WriteLine($"You placed {setNameChoice.SelectedItem}"); });
+	menu.Show();
+}
+```
+
+The main menu of this appears as:
+
+```
+----------------------------
+ Too Many Choices Menu
+----------------------------
+ > 1. Set Placement [First]
+   2. Print Placement
+----------------------------
+```
+
+And going into the 'set placement' menu shows as (after going down to the 5th item):
+```
+----------------------------
+ Set Placement
+----------------------------
+   1. First
+   2. Second
+   3. Third
+   4. Fourth
+ > 5. Fifth
+----------------------------
+```
+
+Pressing down again bumps the shown list by 1.  That is, it doesn't page turn, it's more of a scroll:
+```
+----------------------------
+ Set Placement
+----------------------------
+   2. Second
+   3. Third
+   4. Fourth
+   5. Fifth
+ > 6. Sixth
+----------------------------
+```
+
+Pressing Page-Down button increments the first-shown item by the page size (in this case 5).  If the end 
+of the list is reached, the menu still shows a full list.   So a page size of 5 and 7 items, page down will 
+always show items 3 through 7.   Page up works similarly. 
+
 ## Setting a value and running a command
 
 Currently, this feature is not yet implemented.

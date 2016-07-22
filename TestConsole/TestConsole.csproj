@@ -49,6 +49,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SelectOptionMenu.cs" />
     <Compile Include="SimpleMenu.cs" />
+    <Compile Include="TooManyChoiceOptions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

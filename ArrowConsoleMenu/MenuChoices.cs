@@ -11,7 +11,7 @@ namespace ArrowConsoleMenu
 
         private readonly string _baseDescription;
         public new string Description => $"{_baseDescription} [{SelectedItem}]";
-
+        
         public MenuChoices(string description, List<T> list) : base(description, exitOnSuccessfulSelect: true)
         {
             _baseDescription = description;

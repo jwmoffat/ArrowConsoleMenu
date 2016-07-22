@@ -13,6 +13,8 @@ namespace ArrowConsoleMenu
         protected List<IMenuItem> MenuItems = new List<IMenuItem>();
         protected int CurrItemIndex = 1;
 
+        public int PageSize { get; set; } = 10;
+
         public Menu(string title) : this(title, exitOnSuccessfulSelect: false) { }
 
         protected Menu(string title, bool exitOnSuccessfulSelect)
@@ -24,18 +26,20 @@ namespace ArrowConsoleMenu
         public void Show()
         {
             var invalidChoice = false;
-            var arrowPressed = false;
+            var navigationButtonPressed = false;
+
+            var firstItemIndexOnPage = 1;
 
             do
             {
                 var menuItems = MenuItemsFunc == null ? MenuItems : MenuItemsFunc();
 
-                arrowPressed = false;
+                navigationButtonPressed = false;
                 Console.Clear();
                 Console.WriteLine(Separator);
                 Console.WriteLine($"{_title}");
                 Console.WriteLine(Separator);
-                for (var i = 1; i <= menuItems.Count; i++)
+                for (var i = firstItemIndexOnPage; i <= menuItems.Count && i < (firstItemIndexOnPage + PageSize); i++)
                 {
                     Console.WriteLine($"{(i == CurrItemIndex ? '>' : ' ')} {i}. {menuItems[i - 1].Description}");
                 }
@@ -64,12 +68,35 @@ namespace ArrowConsoleMenu
                     case ConsoleKey.UpArrow:
                         CurrItemIndex--;
                         if (CurrItemIndex < 1) CurrItemIndex = 1;
-                        arrowPressed = true;
+                        if (CurrItemIndex < firstItemIndexOnPage) firstItemIndexOnPage = CurrItemIndex;
+                        navigationButtonPressed = true;
                         break;
                     case ConsoleKey.DownArrow:
                         CurrItemIndex++;
                         if (CurrItemIndex > menuItems.Count) CurrItemIndex = menuItems.Count;
-                        arrowPressed = true;
+                        if (CurrItemIndex >= firstItemIndexOnPage + PageSize && CurrItemIndex <= menuItems.Count)
+                        {
+                            // want to bump the first item on the page
+                            firstItemIndexOnPage++;
+                        }
+                        navigationButtonPressed = true;
+                        break;
+                    case ConsoleKey.PageDown:
+                        {
+                            var wantToJumpTo = firstItemIndexOnPage + PageSize;
+                            var maxFirstItem = menuItems.Count - PageSize + 1; // 12 items, page size = 10, 1-10, 2-11, 3-12
+                            if (maxFirstItem < 1) maxFirstItem = 1;
+                            if (wantToJumpTo > maxFirstItem) wantToJumpTo = maxFirstItem;
+                            firstItemIndexOnPage = wantToJumpTo;
+                            CurrItemIndex = firstItemIndexOnPage;
+                        }
+                        navigationButtonPressed = true;
+                        break;
+                    case ConsoleKey.PageUp:
+                        firstItemIndexOnPage = firstItemIndexOnPage - PageSize;
+                        if (firstItemIndexOnPage < 1) firstItemIndexOnPage = 1;
+                        CurrItemIndex = firstItemIndexOnPage;
+                        navigationButtonPressed = true;
                         break;
                     case ConsoleKey.Enter:
                     case ConsoleKey.RightArrow:
@@ -78,7 +105,7 @@ namespace ArrowConsoleMenu
                         break;
                 }
 
-                if (arrowPressed)
+                if (navigationButtonPressed)
                 {
                     invalidChoice = false;
                 }
@@ -91,7 +118,7 @@ namespace ArrowConsoleMenu
                     menuItems[menuChoice - 1].RunAction();
                     invalidChoice = false;
                 }
-            } while (invalidChoice || arrowPressed || !ExitOnSuccessfulSelect);
+            } while (invalidChoice || navigationButtonPressed || !ExitOnSuccessfulSelect);
         }
 
         public void AddChoices<T>(MenuChoices<T> menuChoices)
