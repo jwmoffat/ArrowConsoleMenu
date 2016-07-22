@@ -1,4 +1,7 @@
-# Original Purpose
+# ArrowConsoleMenu
+A console menu in .Net
+
+## Original Purpose
 
 Originally I started this code to be a method of allowing a user, particularly a person in a QA department, to browse through various commands within an 
 app.   It would give them a list of options, execute the command they wanted, then return them back to the menu again.
