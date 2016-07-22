@@ -1,10 +1,13 @@
 # ArrowConsoleMenu
-A console menu in .Net
+A console menu in .Net used to execute custom commands (ie: against a library).   Still a work in progress, but
+I thought I'd share.
 
 ## Original Purpose
 
-Originally I started this code to be a method of allowing a user, particularly a person in a QA department, to browse through various commands within an 
+Originally I started this code to be a method of allowing a user to interact with various commands within an 
 app.   It would give them a list of options, execute the command they wanted, then return them back to the menu again.
+
+Basically, just a console interface to whatever library I wanted them to poke around with.
 
 Over time, this has slowly changed, including this document.  Hopefully this is starting to make more sense.
 
