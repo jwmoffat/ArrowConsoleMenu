@@ -235,6 +235,24 @@ Pressing Page-Down button increments the first-shown item by the page size (in t
 of the list is reached, the menu still shows a full list.   So a page size of 5 and 7 items, page down will 
 always show items 3 through 7.   Page up works similarly. 
 
+## Text input from user
+
+*(Currently only strings until later)*
+
+There are times when you might want the user to input some text value.  
+
+```csharp
+static void Main(string[] args)
+{
+	var menuTextInputChoice = new MenuTextChoice("Email Address", "bob@localhost");
+
+    var menu = new Menu("Set Text Menu");
+    menu.AddTextInput(menuTextInputChoice);
+    menu.AddCommand("Print current email address", () => { Console.WriteLine($"Email address = '{menuTextInputChoice.Value}'");});
+	menu.Show();
+}
+```
+
 ## Setting a value and running a command
 
 Currently, this feature is not yet implemented.
