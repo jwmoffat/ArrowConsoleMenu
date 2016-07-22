@@ -12,6 +12,7 @@ namespace ArrowConsoleMenu
         protected Func<List<IMenuItem>> MenuItemsFunc = null;
         protected List<IMenuItem> MenuItems = new List<IMenuItem>();
         protected int CurrItemIndex = 1;
+        protected int FirstItemIndexOnPage = 1;
 
         public int PageSize { get; set; } = 10;
 
@@ -28,8 +29,6 @@ namespace ArrowConsoleMenu
             var invalidChoice = false;
             var navigationButtonPressed = false;
 
-            var firstItemIndexOnPage = 1;
-
             do
             {
                 var menuItems = MenuItemsFunc == null ? MenuItems : MenuItemsFunc();
@@ -39,7 +38,7 @@ namespace ArrowConsoleMenu
                 Console.WriteLine(Separator);
                 Console.WriteLine($"{_title}");
                 Console.WriteLine(Separator);
-                for (var i = firstItemIndexOnPage; i <= menuItems.Count && i < (firstItemIndexOnPage + PageSize); i++)
+                for (var i = FirstItemIndexOnPage; i <= menuItems.Count && i < (FirstItemIndexOnPage + PageSize); i++)
                 {
                     Console.WriteLine($"{(i == CurrItemIndex ? '>' : ' ')} {i}. {menuItems[i - 1].Description}");
                 }
@@ -68,34 +67,34 @@ namespace ArrowConsoleMenu
                     case ConsoleKey.UpArrow:
                         CurrItemIndex--;
                         if (CurrItemIndex < 1) CurrItemIndex = 1;
-                        if (CurrItemIndex < firstItemIndexOnPage) firstItemIndexOnPage = CurrItemIndex;
+                        if (CurrItemIndex < FirstItemIndexOnPage) FirstItemIndexOnPage = CurrItemIndex;
                         navigationButtonPressed = true;
                         break;
                     case ConsoleKey.DownArrow:
                         CurrItemIndex++;
                         if (CurrItemIndex > menuItems.Count) CurrItemIndex = menuItems.Count;
-                        if (CurrItemIndex >= firstItemIndexOnPage + PageSize && CurrItemIndex <= menuItems.Count)
+                        if (CurrItemIndex >= FirstItemIndexOnPage + PageSize && CurrItemIndex <= menuItems.Count)
                         {
                             // want to bump the first item on the page
-                            firstItemIndexOnPage++;
+                            FirstItemIndexOnPage++;
                         }
                         navigationButtonPressed = true;
                         break;
                     case ConsoleKey.PageDown:
                         {
-                            var wantToJumpTo = firstItemIndexOnPage + PageSize;
+                            var wantToJumpTo = FirstItemIndexOnPage + PageSize;
                             var maxFirstItem = menuItems.Count - PageSize + 1; // 12 items, page size = 10, 1-10, 2-11, 3-12
                             if (maxFirstItem < 1) maxFirstItem = 1;
                             if (wantToJumpTo > maxFirstItem) wantToJumpTo = maxFirstItem;
-                            firstItemIndexOnPage = wantToJumpTo;
-                            CurrItemIndex = firstItemIndexOnPage;
+                            FirstItemIndexOnPage = wantToJumpTo;
+                            CurrItemIndex = FirstItemIndexOnPage;
                         }
                         navigationButtonPressed = true;
                         break;
                     case ConsoleKey.PageUp:
-                        firstItemIndexOnPage = firstItemIndexOnPage - PageSize;
-                        if (firstItemIndexOnPage < 1) firstItemIndexOnPage = 1;
-                        CurrItemIndex = firstItemIndexOnPage;
+                        FirstItemIndexOnPage = FirstItemIndexOnPage - PageSize;
+                        if (FirstItemIndexOnPage < 1) FirstItemIndexOnPage = 1;
+                        CurrItemIndex = FirstItemIndexOnPage;
                         navigationButtonPressed = true;
                         break;
                     case ConsoleKey.Enter:
