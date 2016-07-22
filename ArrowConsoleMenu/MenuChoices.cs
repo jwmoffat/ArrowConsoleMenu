@@ -10,7 +10,7 @@ namespace ArrowConsoleMenu
         public T SelectedItem => _listFunction()[CurrItemIndex - 1];
 
         private readonly string _baseDescription;
-        public string Description => $"{_baseDescription} [{SelectedItem}]";
+        public new string Description => $"{_baseDescription} [{SelectedItem}]";
 
         public MenuChoices(string description, List<T> list) : base(description, exitOnSuccessfulSelect: true)
         {
@@ -24,11 +24,6 @@ namespace ArrowConsoleMenu
             _baseDescription = description;
             _listFunction = listFunction;
             MenuItemsFunc = () => { return listFunction().Select(x => new MenuItem(x.ToString(), () => { }, pauseAtEndOfAction: false)).ToList<IMenuItem>(); };
-        }
-        
-        public void RunAction()
-        {
-            this.Show();
         }
     }
 }

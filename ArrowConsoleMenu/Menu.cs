@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace ArrowConsoleMenu
 {
-    public class Menu
+    public class Menu : IMenuItem
     {
         const string Separator = "- - - - - - - - - - - - - - - - - - - - - - - - ";
 
@@ -102,6 +102,17 @@ namespace ArrowConsoleMenu
         public void AddCommand(string commandName, Action action, bool wait = false)
         {
             MenuItems.Add(new MenuItem(commandName, action, pauseAtEndOfAction: wait));
+        }
+
+        public void AddSubMenu(Menu subMenu)
+        {
+            MenuItems.Add(subMenu);
+        }
+
+        public string Description => _title;
+        public void RunAction()
+        {
+            Show();
         }
     }
 }
