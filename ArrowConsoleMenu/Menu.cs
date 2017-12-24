@@ -125,6 +125,11 @@ namespace ArrowConsoleMenu
             MenuItems.Add(menuChoices);
         }
 
+        public void AddFileMenu(MenuFileChooser directoryMenu)
+        {
+            MenuItems.Add(directoryMenu);
+        }
+
         public void AddCommand(string commandName, Action action, bool wait = true)
         {
             MenuItems.Add(new MenuItem(commandName, action, pauseAtEndOfAction: wait));
