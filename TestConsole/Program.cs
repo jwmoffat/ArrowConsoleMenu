@@ -14,6 +14,7 @@ namespace TestConsole
             menu.AddSubMenu(NonStringClassExample.GetExampleMenu());
             menu.AddSubMenu(TooManyChoiceOptions.GetExampleMenu());
             menu.AddSubMenu(InputTextExample.GetExampleMenu());
+            menu.AddSubMenu(MenuFileChooserExample.GetExampleMenu());
             menu.Show();
         }
     }
